@@ -1,18 +1,29 @@
-﻿using System.Collections;
+﻿/*
+ * Full Name        : Negin Saeidi
+ * Student ID       : 101261395
+ * Date Modified    : October 20, 2021
+ * File             : PlayerController.cs
+ * Description      : This is the Player controller script - It controls the motion of the player and firing capability
+ * Version          : V02
+ * Revision History : Added comments to the code 
+ */
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEditor;
 using UnityEngine;
-
+/// <summary>
+/// The PlayerController class
+/// </summary>
 public class PlayerController : MonoBehaviour
 {
     public BulletManager bulletManager;
 
     [Header("Boundary Check")]
-    public float horizontalBoundary;
+    public float VerticalBoundary;
 
     [Header("Player Speed")]
-    public float horizontalSpeed;
+    public float VerticalSpeed;
     public float maxSpeed;
     public float horizontalTValue;
 
@@ -37,8 +48,11 @@ public class PlayerController : MonoBehaviour
         _CheckBounds();
         _FireBullet();
     }
-
-     private void _FireBullet()
+    /// <summary>
+    /// The fireBullets function
+    /// it gets bullet from the bullet manager and set their position to spawnPosition
+    /// </summary>
+    private void _FireBullet()
     {
         // delay bullet firing 
         if(Time.frameCount % 60 == 0 && bulletManager.HasBullets())
@@ -46,7 +60,10 @@ public class PlayerController : MonoBehaviour
             bulletManager.GetBullet(transform.position);
         }
     }
-
+    /// <summary>
+    /// The Move function
+    /// Gets y componet of touch position and change the direction of the player should move
+    /// </summary>
     private void _Move()
     {
         float direction = 0.0f;
@@ -56,13 +73,13 @@ public class PlayerController : MonoBehaviour
         {
             var worldTouch = Camera.main.ScreenToWorldPoint(touch.position);
 
-            if (worldTouch.x > transform.position.x)
+            if (worldTouch.y > transform.position.y)
             {
                 // direction is positive
                 direction = 1.0f;
             }
 
-            if (worldTouch.x < transform.position.x)
+            if (worldTouch.y < transform.position.y)
             {
                 // direction is negative
                 direction = -1.0f;
@@ -73,7 +90,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // keyboard support
-        if (Input.GetAxis("Horizontal") >= 0.1f) 
+        if (Input.GetAxis("Horizontal") >= 0.1f)
         {
             // direction is positive
             direction = 1.0f;
@@ -85,31 +102,35 @@ public class PlayerController : MonoBehaviour
             direction = -1.0f;
         }
 
-        if (m_touchesEnded.x != 0.0f)
+        if (m_touchesEnded.y != 0.0f)
         {
-           transform.position = new Vector2(Mathf.Lerp(transform.position.x, m_touchesEnded.x, horizontalTValue), transform.position.y);
+            transform.position = new Vector2(transform.position.x, Mathf.Lerp(transform.position.y, m_touchesEnded.y, horizontalTValue));
         }
         else
         {
-            Vector2 newVelocity = m_rigidBody.velocity + new Vector2(direction * horizontalSpeed, 0.0f);
+            Vector2 newVelocity = m_rigidBody.velocity + new Vector2(direction * VerticalSpeed, 0.0f);
             m_rigidBody.velocity = Vector2.ClampMagnitude(newVelocity, maxSpeed);
             m_rigidBody.velocity *= 0.99f;
         }
     }
-
+    /// <summary>
+    /// The checkBound function
+    /// prevents the player going out of the screen 
+    /// </summary>
     private void _CheckBounds()
     {
         // check right bounds
-        if (transform.position.x >= horizontalBoundary)
+        if (transform.position.y >= VerticalBoundary)
         {
-            transform.position = new Vector3(horizontalBoundary, transform.position.y, 0.0f);
+            transform.position = new Vector3(transform.position.x, VerticalBoundary, 0.0f);
         }
 
         // check left bounds
-        if (transform.position.x <= -horizontalBoundary)
+        if (transform.position.y <= -VerticalBoundary)
         {
-            transform.position = new Vector3(-horizontalBoundary, transform.position.y, 0.0f);
+            transform.position = new Vector3(transform.position.x, -VerticalBoundary, 0.0f);
         }
+
 
     }
 }
